@@ -58,8 +58,6 @@ extern "C" {
 	bool SKSEPlugin_Load(const SKSEInterface * skse) {
 		_MESSAGE("Patching sprint check in JumpHandler");
 
-
-
 		// nop first fail jump
 		SafeWrite16(sprintCheckOne.GetUIntPtr(), 0x9090); 
 		// nop second fail jump
