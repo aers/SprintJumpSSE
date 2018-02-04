@@ -11,21 +11,23 @@ sprint check code in jump handler, 1.5.23:
 .text:0000000140708FBC                 mov     rcx, cs:qword_142F4CE68
 .text:0000000140708FC3                 call    sub_140608640
 .text:0000000140708FC8                 test    al, al
-.text:0000000140708FCA                 jnz     short loc_140708FF9     // check one
+.text:0000000140708FCA                 jnz     short loc_140708FF9     
 .text:0000000140708FCC                 mov     rcx, cs:qword_142F4CE68
 .text:0000000140708FD3                 mov     edx, 100h
 .text:0000000140708FD8                 add     rcx, 0B8h
 .text:0000000140708FDF                 call    sub_14063C170
 .text:0000000140708FE4                 test    al, al
-.text:0000000140708FE6                 jnz     short loc_140708FF9     // check two
+.text:0000000140708FE6                 jnz     short loc_140708FF9     
 .text:0000000140708FE8                 mov     rcx, cs:qword_142F4CE68
 .text:0000000140708FEF                 add     rsp, 20h
 .text:0000000140708FF3                 pop     rbx
 .text:0000000140708FF4                 jmp     sub_1405D1DC0
+
+jmp from 708FBC to 708FE8 skips checks
 */
 		
-RelocAddr <uintptr_t *> sprintCheckOne = 0x708FCA;
-RelocAddr <uintptr_t *> sprintCheckTwo = 0x708FE6;
+RelocAddr <uintptr_t *> sprintCheckStart = 0x708FBC;
+RelocAddr <uintptr_t *> sprintCheckEnd = 0x708FE6;
 
 extern "C" {
 	bool SKSEPlugin_Query(const SKSEInterface * skse, PluginInfo * info)
@@ -58,10 +60,8 @@ extern "C" {
 	bool SKSEPlugin_Load(const SKSEInterface * skse) {
 		_MESSAGE("Patching sprint check in JumpHandler");
 
-		// nop first fail jump
-		SafeWrite16(sprintCheckOne.GetUIntPtr(), 0x9090); 
-		// nop second fail jump
-		SafeWrite16(sprintCheckTwo.GetUIntPtr(), 0x9090);
+		SafeWrite8(sprintCheckStart.GetUIntPtr(), 0xEB); // short jmp
+		SafeWrite8(sprintCheckStart.GetUIntPtr() + 0x01, sprintCheckEnd.GetUIntPtr() - sprintCheckStart.GetUIntPtr()); // to end of sprint check
 		
 		_MESSAGE("Patched");
 		return true;
