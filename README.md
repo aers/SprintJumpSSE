@@ -2,7 +2,8 @@
 
 Small skse64 plugin that enables you to jump while sprinting in Skyrim Special Edition.
 
-For game version 1.5.23/skse64 version 2.0.6 alpha
+Release build: for game version 1.5.23/skse64 version 2.0.6 alpha
+Source: for game version 1.5.39/skse64 version unreleased
 
 ## Building
 
