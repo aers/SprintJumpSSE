@@ -5,29 +5,29 @@
 #include <shlobj.h>
 
 /*
-sprint check code in jump handler, 1.5.23:
+sprint check code in jump handler, 1.5.39:
 
-.text:0000000140708FBC loc_140708FBC:                          ; CODE XREF: sub_140708EE0+CA↑j
-.text:0000000140708FBC                 mov     rcx, cs:qword_142F4CE68
-.text:0000000140708FC3                 call    sub_140608640
-.text:0000000140708FC8                 test    al, al
-.text:0000000140708FCA                 jnz     short loc_140708FF9     
-.text:0000000140708FCC                 mov     rcx, cs:qword_142F4CE68
-.text:0000000140708FD3                 mov     edx, 100h
-.text:0000000140708FD8                 add     rcx, 0B8h
-.text:0000000140708FDF                 call    sub_14063C170
-.text:0000000140708FE4                 test    al, al
-.text:0000000140708FE6                 jnz     short loc_140708FF9     
-.text:0000000140708FE8                 mov     rcx, cs:qword_142F4CE68
-.text:0000000140708FEF                 add     rsp, 20h
-.text:0000000140708FF3                 pop     rbx
-.text:0000000140708FF4                 jmp     sub_1405D1DC0
+.text:000000014070962C loc_14070962C:                          ; CODE XREF: sub_140709550+CA↑j
+.text:000000014070962C                 mov     rcx, cs:qword_142F4DEF8
+.text:0000000140709633                 call    sub_140608CB0
+.text:0000000140709638                 test    al, al
+.text:000000014070963A                 jnz     short loc_140709669
+.text:000000014070963C                 mov     rcx, cs:qword_142F4DEF8
+.text:0000000140709643                 mov     edx, 100h
+.text:0000000140709648                 add     rcx, 0B8h
+.text:000000014070964F                 call    sub_14063C7E0
+.text:0000000140709654                 test    al, al
+.text:0000000140709656                 jnz     short loc_140709669
+.text:0000000140709658                 mov     rcx, cs:qword_142F4DEF8
+.text:000000014070965F                 add     rsp, 20h
+.text:0000000140709663                 pop     rbx
+.text:0000000140709664                 jmp     sub_1405D2430
 
-jmp from 708FBC to 708FE8 skips checks
+jumping to 709658 bypasses check
 */
 		
-RelocAddr <uintptr_t *> sprintCheckStart = 0x708FBC;
-RelocAddr <uintptr_t *> sprintCheckEnd = 0x708FE6;
+RelocAddr <uintptr_t *> sprintCheckStart = 0x70962C;
+RelocAddr <uintptr_t *> sprintCheckEnd = 0x709658;
 
 extern "C" {
 	bool SKSEPlugin_Query(const SKSEInterface * skse, PluginInfo * info)
@@ -60,8 +60,12 @@ extern "C" {
 	bool SKSEPlugin_Load(const SKSEInterface * skse) {
 		_MESSAGE("Patching sprint check in JumpHandler");
 
+		// short jmp
+		// 0xEB 0x??
+		// jumps from end of jmp instruction ?? bytes
+
 		SafeWrite8(sprintCheckStart.GetUIntPtr(), 0xEB); // short jmp
-		SafeWrite8(sprintCheckStart.GetUIntPtr() + 0x01, sprintCheckEnd.GetUIntPtr() - sprintCheckStart.GetUIntPtr()); // to end of sprint check
+		SafeWrite8(sprintCheckStart.GetUIntPtr() + 0x01, sprintCheckEnd.GetUIntPtr() - sprintCheckStart.GetUIntPtr() - 0x02); // to end of sprint check
 		
 		_MESSAGE("Patched");
 		return true;
