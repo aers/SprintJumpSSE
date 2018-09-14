@@ -26,8 +26,8 @@ sprint check code in jump handler, 1.5.39:
 jumping to 709658 bypasses check
 */
 		
-RelocAddr <uintptr_t *> sprintCheckStart = 0x70962C;
-RelocAddr <uintptr_t *> sprintCheckEnd = 0x709658;
+RelocAddr <uintptr_t *> sprintCheckStart = 0x70936C;
+RelocAddr <uintptr_t *> sprintCheckEnd = 0x709398;
 
 extern "C" {
 	bool SKSEPlugin_Query(const SKSEInterface * skse, PluginInfo * info)
